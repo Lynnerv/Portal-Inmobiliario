@@ -13,6 +13,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 // Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddScoped<Portal_Inmobiliario.Services.IAgendaService, Portal_Inmobiliario.Services.AgendaService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -48,7 +49,8 @@ app.UseRouting();
 
 /* 👇  IMPORTANTE: usar sesión ANTES de auth/endpoints  */
 app.UseSession();
-
+// 👇 FALTA ESTO
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
