@@ -17,13 +17,20 @@ namespace Portal_Inmobiliario.Data
             base.OnModelCreating(b);
 
             b.Entity<Inmueble>().HasIndex(i => i.Codigo).IsUnique();
-            b.Entity<Inmueble>().ToTable(t => t.HasCheckConstraint("CK_Inmueble_Precio_Pos", "Precio > 0"));
-            b.Entity<Inmueble>().ToTable(t => t.HasCheckConstraint("CK_Inmueble_M2_Pos", "MetrosCuadrados > 0"));
+    b.Entity<Inmueble>().ToTable(t => t.HasCheckConstraint("CK_Inmueble_Precio_Pos", "Precio > 0"));
+    b.Entity<Inmueble>().ToTable(t => t.HasCheckConstraint("CK_Inmueble_M2_Pos", "MetrosCuadrados > 0"));
 
-            b.Entity<Visita>().ToTable(t => t.HasCheckConstraint("CK_Visita_Rango", "FechaInicio < FechaFin"));
-            b.Entity<Visita>().HasIndex(v => new { v.InmuebleId, v.FechaInicio, v.FechaFin });
+    // 👇👇  importante para SQLite: guardar decimal como REAL (double)
+    b.Entity<Inmueble>()
+        .Property(p => p.Precio)
+        .HasConversion<double>()        // convierte decimal <-> double
+        .HasColumnType("REAL");         // columna REAL en SQLite
+    // ☝️☝️
 
-            b.Entity<Reserva>().HasIndex(r => new { r.InmuebleId, r.FechaExpiracion });
-        }
+    b.Entity<Visita>().ToTable(t => t.HasCheckConstraint("CK_Visita_Rango", "FechaInicio < FechaFin"));
+    b.Entity<Visita>().HasIndex(v => new { v.InmuebleId, v.FechaInicio, v.FechaFin });
+
+    b.Entity<Reserva>().HasIndex(r => new { r.InmuebleId, r.FechaExpiracion });
+}
     }
 }

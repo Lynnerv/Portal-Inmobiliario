@@ -1,0 +1,26 @@
+@model Portal_Inmobiliario.Models.Inmueble
+@{
+    ViewData["Title"] = "Detalle";
+}
+<a asp-action="Index" class="btn btn-link">&larr; Volver</a>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <img src="@(!string.IsNullOrEmpty(Model.Imagen)? Model.Imagen : "https://via.placeholder.com/900x500?text=Inmueble")"
+             class="img-fluid rounded" alt="@Model.Titulo" />
+    </div>
+    <div class="col-md-6">
+        <h3>@Model.Titulo</h3>
+        <p><strong>Ciudad:</strong> @Model.Ciudad</p>
+        <p><strong>Dirección:</strong> @Model.Direccion</p>
+        <p><strong>Tipo:</strong> @Model.Tipo</p>
+        <p><strong>M²:</strong> @Model.MetrosCuadrados</p>
+        <p><strong>Dormitorios:</strong> @Model.Dormitorios · <strong>Baños:</strong> @Model.Banos</p>
+        <h4 class="text-primary fw-bold mt-3">COP @Model.Precio:N0</h4>
+
+        <div class="mt-3 d-flex gap-2">
+            <a class="btn btn-success" title="Disponible en Pregunta 3">Agendar visita</a>
+            <button class="btn btn-outline-secondary" disabled title="Disponible en Pregunta 3">Reservar ahora</button>
+        </div>
+    </div>
+</div>

@@ -4,19 +4,31 @@ using Portal_Inmobiliario.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+// DB
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
+
+/* 👇👇  HABILITAR SESIÓN (en memoria, suficiente para P2)  👇👇 */
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(o =>
+{
+    o.Cookie.Name = ".portal.s";
+    o.IdleTimeout = TimeSpan.FromHours(8);
+    o.Cookie.HttpOnly = true;
+});
+/* ☝️☝️  FIN SESIÓN  ☝️☝️ */
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -24,15 +36,18 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 await Portal_Inmobiliario.Data.Seed.RunAsync(app.Services);
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+/* 👇  IMPORTANTE: usar sesión ANTES de auth/endpoints  */
+app.UseSession();
 
 app.UseAuthorization();
 
